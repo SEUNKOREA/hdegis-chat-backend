@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "pjt-dev-hdermd-app",
+  "private_key_id": "aebfb82339a96484927eff34ed698d8c0ce2d2b9",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDJcjxE7JuPdOZW\nHc2YM3LbhQ1KMTfxVxvc/e38QQ/BipchdajVn5YnFXjwrI1VFUVTo3dHdRkCf8dV\nc6rqrzhDJRn7j+n+QL1tLhQKMDhxizy2uZF2AlPAFCWNRBQuvHSY3y5cM0orpP9S\nFPRfKy1hWE6b+4lF5iQr7Xe1ZbOxwIw+7SxENHIV0V1/rvNXSKcTPWHtB5kgPaq7\nu4yFIhcp9NvhHpdDB4nHACtZd/sDeyMEclG6j1KBNzWSOg+RuGRaR/zKzUvaKjlL\nUs7j+YxmGKCmxklBJeOU3mOYbfxM11bk4w5jwxSzHs7dvj/ByEpn8o/zu+sJ9pSe\n34xuYsp3AgMBAAECggEASb9k+hSm9JNm2eMKR+yZ4Wypy14ObW+m9zYNQJqvAntS\nzcCN4TsN1NwjDPUWvq3NVgvTmJjxYX1XA90XFtiz37z+8J4km1ynHIfQdVRm7YZ8\nYSa5bnr2nyyg/MEOJHgAtZCLH9z1C9pZUHr0ZbzgXbFfAfLJtAnHdz914jZL3UgK\nJqOHi36KkYcs41piuO1g+swKLi8u9e9A4rksjmulRl4dH93Y3IN9BL6nz4c0oYYU\nW1ybVhk0r50rVvUW+VBGvGzOcvaKpV4isJSohp110KD3EJOfkYVx/emIs95w/aB3\nuuReRdbzcOZ0cDmjCMe3oyicjcxblwYpffi7kjmDLQKBgQDR9Rc77tCc2m7iLbX5\nhrOYrMrjmThrGdOq9rQ8VcQgMoNJr2+8BVJDYntoXGGkW2aK9V2V+//6q9DQmc0r\n5MTUqm2xYQK5gXtbYiwgt9c/bdcM0Jxt/aNBzWZBWNglDbf2ZXGDBlO1yyzivcOS\nMC7SLuwwB6B0EmmPxYQ70APNEwKBgQD1n1UeMAiLifNdf0u56gS5YTahMc4yVEKW\nBlw/sC2xCQYODTlUSdH1/z4PyLPlN0vZkAtaMnDnZSG7w6GFFknPy6RsT7KqE9T2\npZcb6RK7329L30+fFVdOZ8JTj5JKCKGd0z1FMmPOiYRAon5trB351SPvBMWdddU9\nGZD9ahetjQKBgQCqyiNnRmH+ZhVy+VohK7jmhhDYyafCP5UWam688cuDoXN4ujQ7\nD10WoYLfpt5qs0sb2HKTchWNlLxdI+9pOEQA9s4aT17HBhQRhy98Qe/fkfswWnYV\nZxCpk2sN1zakFZ/C2ExZGAl6RVcy7sirH3TG1xKcE2grY1rpb/OcMB8XbwKBgQCL\nQymZkhZmN3MaoeAnqv2+tdWpk3mbo5aVRUnselGNvNYIBYtptOkslulzPZJx9eY1\nlqw5GbxWFksIEKV1tetnu8if+JgOQmxO5BhHJOEQUGDkHdshEZKMy9usUQzamQY5\nW9mzcBySr/miQ/92402jpytWi9gXrQWYPPSuGgcOyQKBgQCxflquCJMtBkeSyDVD\nvE35CyjEAlGbLeThiMCA5c+spLf/83orJDHtn8XoJt/zBmjg8uZUoKc99/zWk4ax\nQOoXYJ2HuJBAmRZxClP+p0JK6Kg6ABXrHuz7ZgxL30eyh4rOMnPVvseqRuaMBaWn\n6eYhUS/tr6tek82fWZx7iCf6UQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "sa-dev-hdermd-app-collect@pjt-dev-hdermd-app.iam.gserviceaccount.com",
+  "client_id": "107888606365468087546",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/sa-dev-hdermd-app-collect%40pjt-dev-hdermd-app.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
