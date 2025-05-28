@@ -139,9 +139,9 @@ def get_retrieved_context(hits):
     return '\n\n'.join(f"### Retrieved Context {i+1}: {text}" for i, text in enumerate(search_contents))
 
 def timed(label, func, *args, **kwargs):
-    print(f"[{label}] started ...")
+    print(f"======================== [{label}] started ... ========================" )
     start = time.time()
     result = func(*args, **kwargs)
     end = time.time()
-    print(f"[{label}] completed - elapsed time: {end - start:.3f}seconds\n")
+    print(f"======================== [{label}] completed - (elapsed time: {end - start:.3f}seconds) ========================\n")
     return result

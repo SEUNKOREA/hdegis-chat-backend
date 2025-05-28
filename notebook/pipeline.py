@@ -260,7 +260,6 @@ class Generator:
         )
         return resp.text
 
-
 class RAGPipeline:
     def __init__(
         self,
@@ -332,7 +331,7 @@ if __name__ == "__main__":
     # print(retrieved_results)
 
     # ========== ContextBuilder 모듈 초기화 ==========
-    context_builder = ContextBuilder(context_type="image")
+    context_builder = ContextBuilder(context_type="both")
 
     # ========== Generator 모듈 초기화 ==========
     generator = Generator()
@@ -340,25 +339,27 @@ if __name__ == "__main__":
     # ========== Pipeline 조립 ==========
     pipeline = RAGPipeline(retriever, context_builder, generator)
 
-    # ========== Pipeline 모듈별 실행 ==========
-    # user_query = "Are there any requirements regarding the operating method of the circuit breaker, such as spring-operated or hydraulic-operated?"
-    # user_filter = "3. Customer Standard Specifications/Spain/REE"
-    
-    # hits = pipeline.search(user_query, user_filter)
-    # context_parts = pipeline.build_context(hits)
-    # generated_answer = pipeline.generate_answer(user_query, context_parts)
     
     # ========== Pipeline 통합 실행 ==========
     user_query = "Are there any requirements regarding the operating method of the circuit breaker, such as spring-operated or hydraulic-operated?"
     user_filter = "3. Customer Standard Specifications/Spain/REE"
     generated_answer, total_hits, hits = pipeline.run(user_query, user_filter)
 
-    print("\n===========================================================================================================\n")
+
+
+
+
+
+
+
+
+
+    print("\n===========================================<<  USER  >>=================================================\n")
     print(f"User: \n{user_query}")
     print(f"Filter: {user_filter}")
-    print("\n===========================================================================================================\n")
+    print("\n========================================<< AI assitant >>==============================================\n")
     print(f"AI assitant:\n\n{generated_answer}\n")
-    print("\n============================================================================================================\n")
+    print("\n=========================================<<  Reference >>===============================================\n")
     print("[Search Results]")
     for i, hit in enumerate(hits, start=1):
         path = '/'.join(hit['_source']['folder_levels'])
@@ -367,3 +368,12 @@ if __name__ == "__main__":
         score = hit['_score']
         print(f"[{i:02d}] {path, name, page} (score: {score})")
     print("\n============================================================================================================")
+
+
+    # ========== Pipeline 모듈별 실행 ==========
+    # user_query = "Are there any requirements regarding the operating method of the circuit breaker, such as spring-operated or hydraulic-operated?"
+    # user_filter = "3. Customer Standard Specifications/Spain/REE"
+    
+    # hits = pipeline.search(user_query, user_filter)
+    # context_parts = pipeline.build_context(hits)
+    # generated_answer = pipeline.generate_answer(user_query, context_parts)
