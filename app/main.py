@@ -26,7 +26,7 @@ settings = get_settings()
 app = FastAPI(
     title=settings.api_title,
     version=settings.api_version,
-    description="HD-Agent RAG 파이프라인 백엔드 API",
+    description="hdegis-chat-backend 파이프라인 백엔드 API",
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -53,7 +53,7 @@ async def global_exception_handler(request, exc):
 async def root():
     """루트 엔드포인트"""
     return {
-        "message": "HD-Agent Backend API",
+        "message": "hdegis-chat-backend API",
         "version": settings.api_version,
         "status": "running"
     }
@@ -61,7 +61,7 @@ async def root():
 @app.get("/health")
 async def health_check():
     """헬스 체크 엔드포인트"""
-    return {"status": "healthy", "service": "hd-agent-backend"}
+    return {"status": "healthy", "service": "hdegis-chat-backend"}
 
 if __name__ == "__main__":
     import uvicorn

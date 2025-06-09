@@ -6,7 +6,7 @@
 """
 
 from functools import lru_cache
-from typing import List
+from typing import List, Optional
 from pydantic_settings import BaseSettings
 
 
@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     """애플리케이션 설정"""
     
     # API 설정
-    api_title: str = "HD-Agent Backend"
+    api_title: str = "hdegis-chat-backend"
     api_version: str = "1.0.0"
     
     # CORS 설정
@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     minio_access_key: str = ""
     minio_secret_key: str = ""
     minio_secure: bool = True
+    
+    # Google Cloud 인증 파일 경로 (추가)
+    google_application_credentials: Optional[str] = None
     
     # 추가 설정
     max_request_size: int = 10 * 1024 * 1024  # 10MB
