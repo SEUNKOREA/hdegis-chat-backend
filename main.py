@@ -18,11 +18,50 @@ from config.base_config import BaseConfig, SearchConfig, GenerationConfig, Conte
 from utils.formatters import format_search_results
 import logging
 
-# 로깅 설정
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+# 로깅 설정 - 상세 로그는 DEBUG로 조정
+def setup_logging():
+    """로깅 설정 함수"""
+    
+    # 루트 로거 설정
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s | %(name)s | %(levelname)s | %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+        force=True
+    )
+    
+    # 외부 라이브러리 로그 레벨을 WARNING으로 설정 (매우 상세한 로그 숨김)
+    external_loggers = [
+        'httpx',                    # HTTP 요청 로그 (POST, GET 등)
+        'elastic_transport.transport',  # Elasticsearch 요청 로그 (매 POST 요청)
+        'google_genai.models',      # Google AI 모델 AFC 로그
+        'urllib3.connectionpool',   # HTTP 연결 풀 로그
+        'requests.packages.urllib3.connectionpool'
+    ]
+    
+    for logger_name in external_loggers:
+        logger = logging.getLogger(logger_name)
+        logger.setLevel(logging.WARNING)  # WARNING 이상만 출력
+    
+    # 주요 실행 단계는 INFO로 유지할 모듈들
+    important_loggers = [
+        'factories',                    # 팩토리 생성 로그
+        'pipeline.rag_pipeline',        # RAG 파이프라인 실행 단계
+        'pipeline.retriever',           # 검색 단계
+        'pipeline.context_builder',     # 컨텍스트 구성 단계
+        'pipeline.generator',           # 답변 생성 단계
+        'utils.formatters',             # 실행 시간 측정
+        'core.search.elastic_searcher', # Elasticsearch 연결/결과 요약
+        'core.embedding.google_embedder', # 임베딩 모델 초기화
+        'core.generation.gemini_generator', # 생성 모델 초기화
+    ]
+    
+    for logger_name in important_loggers:
+        logger = logging.getLogger(logger_name)
+        logger.setLevel(logging.INFO)  # INFO 레벨 유지
+
+# 로깅 설정 적용
+setup_logging()
 logger = logging.getLogger(__name__)
 
 

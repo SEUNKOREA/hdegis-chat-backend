@@ -88,7 +88,9 @@ class ElasticSearcher(BaseSearcher):
                 size=top_k
             )
             
-            return response["hits"]["hits"]
+            hits = response["hits"]["hits"]
+            logger.debug(f"키워드 검색 완료: {len(hits)}개 결과")
+            return hits
             
         except Exception as e:
             logger.error(f"키워드 검색 실패: {e}")
@@ -128,7 +130,9 @@ class ElasticSearcher(BaseSearcher):
                 size=top_k
             )
             
-            return response["hits"]["hits"]
+            hits = response["hits"]["hits"]
+            logger.debug(f"벡터 검색 완료: {len(hits)}개 결과")
+            return hits
             
         except Exception as e:
             logger.error(f"벡터 검색 실패: {e}")
@@ -206,7 +210,9 @@ class ElasticSearcher(BaseSearcher):
                 size=top_k
             )
             
-            return response["hits"]["hits"]
+            hits = response["hits"]["hits"]
+            logger.debug(f"하이브리드 검색 완료: {len(hits)}개 결과")
+            return hits
             
         except Exception as e:
             logger.error(f"하이브리드 검색 실패: {e}")
@@ -221,6 +227,8 @@ class ElasticSearcher(BaseSearcher):
         """검색 결과를 페이지 단위로 확장"""
         expanded_hits = []
         seen_ids = {hit["_id"] for hit in hits}
+        
+        logger.debug(f"페이지 확장 시작: {len(hits)}개 원본, tolerance={tolerance}")
         
         # 각 원본 hit별로 페이지 확장
         for hit in hits:
@@ -268,7 +276,9 @@ class ElasticSearcher(BaseSearcher):
                             seen_ids.add(nid)
                             
                 except Exception as e:
-                    logger.warning(f"페이지 확장 중 오류: {e}")
+                    # 개별 페이지 확장 실패는 DEBUG 레벨로 (너무 상세함)
+                    logger.debug(f"페이지 확장 중 오류 (페이지 {new_page}): {e}")
                     continue
         
+        logger.debug(f"페이지 확장 완료: +{len(expanded_hits)}개 추가")
         return expanded_hits
