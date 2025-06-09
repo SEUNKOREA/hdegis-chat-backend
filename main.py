@@ -105,25 +105,32 @@ def create_custom_config():
 def main():
     """메인 실행 함수 - 커스텀 설정 사용"""
     
-    logger.info("RAG 파이프라인 초기화 중...")
+    logger.info("🚀 커스텀 설정으로 RAG 파이프라인 초기화 중...")
     
     # ========== 커스텀 파이프라인 생성 ==========
     custom_config = create_custom_config()
     pipeline = RAGPipelineFactory.create_pipeline(config=custom_config)
     
     # 파이프라인 설정 확인
-    logger.info(f"현재 설정: {pipeline.get_config()}")
+    logger.info(f"📋 현재 설정: {pipeline.get_config()}")
     
     # ========== 테스트 쿼리 설정 ==========
     user_query = "Are there any requirements regarding the operating method of the circuit breaker, such as spring-operated or hydraulic-operated?"
     user_filter = "3. Customer Standard Specifications/Spain/REE"
     
     # ========== 파이프라인 실행 (동적 데이터만) ==========
-    logger.info("전체 파이프라인 실행 중...")
+    logger.info("🔍 스트리밍 파이프라인 실행 중...")
     
-    generated_answer, total_hits, original_hits = pipeline.run(
-        user_query=user_query,    # 동적 데이터
-        user_filter=user_filter   # 동적 데이터
+    # 기존 non-streaming 방식 (주석 처리)
+    # generated_answer, total_hits, original_hits = pipeline.run(
+    #     user_query=user_query,    # 동적 데이터
+    #     user_filter=user_filter   # 동적 데이터
+    # )
+    
+    # 검색 먼저 수행 (참조 정보용)
+    original_hits = pipeline.search_only(
+        user_query=user_query,
+        user_filter=user_filter
     )
     
     # ========== 결과 출력 ==========
@@ -132,10 +139,16 @@ def main():
     print(f"Filter: {user_filter}")
     
     print("\n" + "="*45 + " AI ASSISTANT " + "="*45)
-    print(f"Answer:\n\n{generated_answer}\n")
+    print("Answer:\n")
+    
+    # 스트리밍 답변 출력
+    for chunk in pipeline.run_stream(user_query, user_filter):
+        print(chunk, end="", flush=True)
+    
+    print("\n\n")  # 답변 완료 후 줄바꿈
     
     print("\n" + "="*45 + " REFERENCE " + "="*46)
-    print(f"Original hits: {len(original_hits)}, Total hits: {len(total_hits)}")
+    print(f"Original hits: {len(original_hits)}")
     print(format_search_results(original_hits))
     
     print("\n" + "="*100)
@@ -143,7 +156,7 @@ def main():
 
 if __name__ == "__main__":
     try:
-        # 🚀 메인 실행
+        # 🚀 메인 실행 (스트리밍)
         main()
         
         logger.info("✅ 실행이 완료되었습니다!")

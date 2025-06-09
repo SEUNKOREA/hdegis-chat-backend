@@ -99,6 +99,70 @@ class GeminiGenerator(BaseGenerator):
             logger.error(f"멀티모달 생성 실패: {e}")
             raise
     
+    def generate_text_stream(
+        self,
+        prompt: str,
+        model: Optional[str] = None,
+        generation_config: Optional[Dict[str, Any]] = None
+    ):
+        """스트리밍 텍스트 생성"""
+        try:
+            model_name = model or self._default_model
+            
+            # Contents 구성
+            contents = [
+                types.Content(
+                    role="user",
+                    parts=[types.Part.from_text(text=prompt)]
+                )
+            ]
+            
+            # GenerateContentConfig 생성
+            config = self._create_generation_config(generation_config)
+            
+            for chunk in self.client.models.generate_content_stream(
+                model=model_name,
+                contents=contents,
+                config=config
+            ):
+                yield chunk.text
+                
+        except Exception as e:
+            logger.error(f"스트리밍 텍스트 생성 실패: {e}")
+            raise
+    
+    def generate_multimodal_stream(
+        self,
+        parts: List[types.Part],
+        model: Optional[str] = None,
+        generation_config: Optional[Dict[str, Any]] = None
+    ):
+        """스트리밍 멀티모달 생성 (텍스트 + 이미지)"""
+        try:
+            model_name = model or self._default_model
+            
+            # Contents 구성
+            contents = [
+                types.Content(
+                    role="user",
+                    parts=parts
+                )
+            ]
+            
+            # GenerateContentConfig 생성
+            config = self._create_generation_config(generation_config)
+            
+            for chunk in self.client.models.generate_content_stream(
+                model=model_name,
+                contents=contents,
+                config=config
+            ):
+                yield chunk.text
+                
+        except Exception as e:
+            logger.error(f"스트리밍 멀티모달 생성 실패: {e}")
+            raise
+    
     def _create_generation_config(self, user_config: Optional[Dict[str, Any]] = None) -> types.GenerateContentConfig:
         """GenerateContentConfig 객체 생성"""
         

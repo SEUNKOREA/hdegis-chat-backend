@@ -69,6 +69,43 @@ class Generator:
             logger.error(f"답변 생성 실패: {e}")
             return "죄송합니다. 답변 생성 중 오류가 발생했습니다."
     
+    def generate_answer_stream(
+        self,
+        user_query: str,
+        context_parts: List[types.Part],
+        generation_config: Optional[Dict[str, Any]] = None
+    ):
+        """
+        컨텍스트를 바탕으로 스트리밍 답변 생성
+        
+        Args:
+            user_query: 사용자 질문
+            context_parts: 컨텍스트 파트들
+            generation_config: 생성 설정 (선택적)
+            
+        Yields:
+            str: 생성된 답변 청크
+        """
+        try:
+            # 프롬프트 구성
+            prompt_parts = self._build_rag_prompt(user_query, context_parts)
+            
+            # 생성 설정
+            gen_config = generation_config or self.config.answer_generation
+            
+            # 스트리밍 답변 생성
+            for chunk in self.generator.generate_multimodal_stream(
+                parts=prompt_parts,
+                generation_config=gen_config
+            ):
+                yield chunk
+            
+            logger.info("스트리밍 답변 생성 완료")
+            
+        except Exception as e:
+            logger.error(f"스트리밍 답변 생성 실패: {e}")
+            yield "죄송합니다. 답변 생성 중 오류가 발생했습니다."
+    
     def _build_rag_prompt(
         self,
         user_query: str,

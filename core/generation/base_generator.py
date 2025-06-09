@@ -50,6 +50,47 @@ class BaseGenerator(ABC):
         """
         pass
     
+    @abstractmethod
+    def generate_text_stream(
+        self,
+        prompt: str,
+        model: Optional[str] = None,
+        generation_config: Optional[Dict[str, Any]] = None
+    ):
+        """
+        스트리밍 텍스트 생성
+        
+        Args:
+            prompt: 입력 프롬프트
+            model: 사용할 모델명
+            generation_config: 생성 설정
+            
+        Yields:
+            str: 생성된 텍스트 청크
+        """
+        pass
+    
+    @abstractmethod
+    def generate_multimodal_stream(
+        self,
+        parts: List[types.Part],
+        model: Optional[str] = None,
+        generation_config: Optional[Dict[str, Any]] = None
+    ):
+        """
+        스트리밍 멀티모달 생성 (텍스트 + 이미지)
+        
+        Args:
+            parts: 입력 파트들 (텍스트, 이미지 등)
+            model: 사용할 모델명
+            generation_config: 생성 설정
+            
+        Yields:
+            str: 생성된 텍스트 청크
+        """
+        pass
+
+
     @property
     @abstractmethod
     def default_model(self) -> str:

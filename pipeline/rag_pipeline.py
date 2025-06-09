@@ -149,6 +149,100 @@ class RAGPipeline:
             logger.error(f"답변 생성 실패: {e}")
             return f"답변 생성 중 오류가 발생했습니다: {str(e)}"
     
+    def run_stream(
+        self,
+        user_query: str,
+        user_filter: str = ""
+    ):
+        """
+        스트리밍 RAG 파이프라인 실행 (동적 데이터만 받음)
+        
+        Args:
+            user_query: 사용자 질문 (동적)
+            user_filter: 사용자 필터 (동적)
+            
+        Yields:
+            str: 생성된 답변 청크
+        """
+        logger.info(f"스트리밍 RAG 파이프라인 시작: '{user_query[:50]}...'")
+        
+        try:
+            # 1. 검색 (config 기반)
+            hits = timed(
+                "검색",
+                self.retriever.search,
+                user_query=user_query,
+                user_filter=user_filter
+            )
+            
+            if not hits:
+                logger.warning("검색 결과가 없습니다")
+                yield "검색 결과를 찾을 수 없습니다."
+                return
+            
+            # 2. 결과 확장 (config의 tolerance 설정에 따라)
+            total_hits = hits
+            if self.retriever.config.tolerance > 0:
+                expanded_hits, total_hits = timed(
+                    "결과 확장",
+                    self.retriever.expand_results,
+                    hits
+                )
+            
+            # 3. 컨텍스트 구성
+            context_parts = timed(
+                "컨텍스트 구성",
+                self.context_builder.build_context,
+                total_hits
+            )
+            
+            # 4. 스트리밍 답변 생성
+            logger.info("스트리밍 답변 생성 시작")
+            for chunk in self.generator.generate_answer_stream(
+                user_query,
+                context_parts
+            ):
+                yield chunk
+            
+            logger.info("스트리밍 RAG 파이프라인 완료")
+            
+        except Exception as e:
+            logger.error(f"스트리밍 RAG 파이프라인 실행 실패: {e}")
+            yield f"처리 중 오류가 발생했습니다: {str(e)}"
+    
+    def generate_only_stream(
+        self,
+        user_query: str,
+        hits: List[Dict[str, Any]],
+        generation_config: Optional[Dict[str, Any]] = None
+    ):
+        """
+        기존 검색 결과로 스트리밍 답변만 생성
+        
+        Args:
+            user_query: 사용자 질문
+            hits: 검색 결과
+            generation_config: 생성 설정
+            
+        Yields:
+            str: 생성된 답변 청크
+        """
+        try:
+            # 컨텍스트 구성
+            context_parts = self.context_builder.build_context(hits)
+            
+            # 스트리밍 답변 생성
+            for chunk in self.generator.generate_answer_stream(
+                user_query,
+                context_parts,
+                generation_config
+            ):
+                yield chunk
+                
+        except Exception as e:
+            logger.error(f"스트리밍 답변 생성 실패: {e}")
+            yield f"답변 생성 중 오류가 발생했습니다: {str(e)}"
+    
     # 설정 조회 메서드들 (디버깅용)
     def get_config(self) -> Dict[str, Any]:
         """현재 파이프라인 설정 반환"""
