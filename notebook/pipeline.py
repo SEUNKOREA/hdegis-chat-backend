@@ -219,7 +219,8 @@ class ContextBuilder:
 
             if self.context_type in ("text", "both"):
                 # --- 1. 텍스트 컨텍스트 가져오기 ---
-                text_data = src["content"]
+                # text_data = src["content"]
+                text_data = src["extracted_text"]
                 # --- 2. 텍스트 파트 생성 --- 
                 text_part = types.Part.from_text(text=text_data)
                 parts.append(text_part)
@@ -318,10 +319,10 @@ if __name__ == "__main__":
 
     # ========== Retriever 모듈 초기화 ==========
     retriever = Retriever(
-        index_name="hde_hvcb_text_004",
+        index_name="hdegis-text-multilingual-embedding-002",
         top_k=10,
         search_method="hybrid",
-        embedding_model_name="text-embedding-004",
+        embedding_model_name="text-multilingual-embedding-002",
         vector_field="embedding",
         text_fields=["content"],
     )
@@ -331,7 +332,7 @@ if __name__ == "__main__":
     # print(retrieved_results)
 
     # ========== ContextBuilder 모듈 초기화 ==========
-    context_builder = ContextBuilder(context_type="both")
+    context_builder = ContextBuilder(context_type="text")
 
     # ========== Generator 모듈 초기화 ==========
     generator = Generator()
@@ -346,14 +347,6 @@ if __name__ == "__main__":
     generated_answer, total_hits, hits = pipeline.run(user_query, user_filter)
 
 
-
-
-
-
-
-
-
-
     print("\n===========================================<<  USER  >>=================================================\n")
     print(f"User: \n{user_query}")
     print(f"Filter: {user_filter}")
@@ -362,11 +355,10 @@ if __name__ == "__main__":
     print("\n=========================================<<  Reference >>===============================================\n")
     print("[Search Results]")
     for i, hit in enumerate(hits, start=1):
-        path = '/'.join(hit['_source']['folder_levels'])
-        name = hit['_source']['pdf_name']
-        page = int(hit['_source']['page'])
+        name = hit['_source']['gcs_pdf_path']
+        page = int(hit['_source']['page_number'])
         score = hit['_score']
-        print(f"[{i:02d}] {path, name, page} (score: {score})")
+        print(f"[{i:02d}] {name, page} (score: {score})")
     print("\n============================================================================================================")
 
 

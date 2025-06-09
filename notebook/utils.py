@@ -47,7 +47,8 @@ class InputProcessor:
         # 각 항목별로 '/' 로 분리 후 마지막 값 추출 (빈 문자열 무시)
         els_filters = [filt.split('/')[-1].strip() for filt in filter_list if filt.strip()]
         # match_phrase 쿼리 목록 구성
-        match_phrase_filters = [{'match_phrase': { 'folder_levels': phrase }} for phrase in els_filters]
+        # match_phrase_filters = [{'match_phrase': { 'folder_levels': phrase }} for phrase in els_filters]
+        match_phrase_filters = [{'match_phrase': { 'gcs_path': phrase }} for phrase in els_filters]
         return match_phrase_filters
     
     def generate_keywords(self, text: str) -> str:
