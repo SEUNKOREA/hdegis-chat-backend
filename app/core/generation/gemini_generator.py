@@ -7,8 +7,8 @@ import logging
 from google import genai
 from google.genai import types
 
-from .base_generator import BaseGenerator
-from config.secrets_config import GoogleCloudSecrets
+from app.core.generation.base_generator import BaseGenerator
+from app.config.secrets_config import GoogleCloudSecrets
 
 logger = logging.getLogger(__name__)
 

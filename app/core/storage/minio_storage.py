@@ -7,8 +7,8 @@ import logging
 from minio import Minio
 from minio.error import S3Error
 
-from .base_storage import BaseStorage
-from config.secrets_config import MinIOSecrets
+from app.core.storage.base_storage import BaseStorage
+from app.config.secrets_config import MinIOSecrets
 
 logger = logging.getLogger(__name__)
 

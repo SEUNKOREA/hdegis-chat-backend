@@ -7,8 +7,8 @@ import logging
 import os
 from google.genai import types
 
-from core.storage.base_storage import BaseStorage
-from config.base_config import ContextConfig
+from app.core.storage.base_storage import BaseStorage
+from app.config.base_config import ContextConfig
 
 logger = logging.getLogger(__name__)
 

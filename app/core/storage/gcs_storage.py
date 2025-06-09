@@ -7,8 +7,8 @@ import logging
 from google.cloud import storage
 from google.cloud.exceptions import NotFound
 
-from .base_storage import BaseStorage
-from config.secrets_config import GoogleCloudSecrets
+from app.core.storage.base_storage import BaseStorage
+from app.config.secrets_config import GoogleCloudSecrets
 
 logger = logging.getLogger(__name__)
 

@@ -5,10 +5,10 @@
 from typing import List, Dict, Any, Tuple, Optional, Generator, Iterator
 import logging
 
-from pipeline.retriever import Retriever
-from pipeline.context_builder import ContextBuilder
-from pipeline.generator import Generator
-from utils.formatters import timed
+from app.pipeline.retriever import Retriever
+from app.pipeline.context_builder import ContextBuilder
+from app.pipeline.generator import Generator
+from app.utils.formatters import timed
 
 logger = logging.getLogger(__name__)
 

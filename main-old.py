@@ -13,9 +13,9 @@ warnings.filterwarnings('ignore', category=InsecureRequestWarning)
 # 환경변수 로드
 load_dotenv()
 
-from factories import RAGPipelineFactory
-from config.base_config import BaseConfig, SearchConfig, GenerationConfig, ContextConfig, StorageConfig, ElasticsearchConfig
-from utils.formatters import format_search_results
+from app.factories import RAGPipelineFactory
+from app.config.base_config import BaseConfig, SearchConfig, GenerationConfig, ContextConfig, StorageConfig, ElasticsearchConfig
+from app.utils.formatters import format_search_results
 import logging
 
 # 로깅 설정 - 상세 로그는 DEBUG로 조정

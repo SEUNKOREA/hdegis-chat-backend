@@ -6,30 +6,30 @@ import logging
 from typing import Optional
 
 # Core 컴포넌트들
-from core.storage.base_storage import BaseStorage
-from core.storage.minio_storage import MinIOStorage
-from core.storage.gcs_storage import GCSStorage
-from core.search.base_searcher import BaseSearcher
-from core.search.elastic_searcher import ElasticSearcher
-from core.embedding.base_embedder import BaseEmbedder
-from core.embedding.google_embedder import GoogleEmbedder
-from core.generation.base_generator import BaseGenerator
-from core.generation.gemini_generator import GeminiGenerator
+from app.core.storage.base_storage import BaseStorage
+from app.core.storage.minio_storage import MinIOStorage
+from app.core.storage.gcs_storage import GCSStorage
+from app.core.search.base_searcher import BaseSearcher
+from app.core.search.elastic_searcher import ElasticSearcher
+from app.core.embedding.base_embedder import BaseEmbedder
+from app.core.embedding.google_embedder import GoogleEmbedder
+from app.core.generation.base_generator import BaseGenerator
+from app.core.generation.gemini_generator import GeminiGenerator
 
 # Pipeline 컴포넌트들
-from pipeline.retriever import Retriever
-from pipeline.context_builder import ContextBuilder
-from pipeline.generator import Generator
-from pipeline.rag_pipeline import RAGPipeline
+from app.pipeline.retriever import Retriever
+from app.pipeline.context_builder import ContextBuilder
+from app.pipeline.generator import Generator
+from app.pipeline.rag_pipeline import RAGPipeline
 
 # 유틸리티 컴포넌트들
-from utils.input_processor import InputProcessor
-from utils.query_enhancer import QueryEnhancer
+from app.utils.input_processor import InputProcessor
+from app.utils.query_enhancer import QueryEnhancer
 
 # 설정
-from config.base_config import BaseConfig, SearchConfig, DEFAULT_CONFIG
-from config.secrets_config import SecretsConfig, load_secrets
-from config.model_mappings import get_embedding_model_for_index
+from app.config.base_config import BaseConfig, SearchConfig, DEFAULT_CONFIG
+from app.config.secrets_config import SecretsConfig, load_secrets
+from app.config.model_mappings import get_embedding_model_for_index
 
 logger = logging.getLogger(__name__)
 

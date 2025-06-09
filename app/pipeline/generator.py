@@ -6,8 +6,9 @@ from typing import List, Dict, Any, Optional
 import logging
 from google.genai import types
 
-from core.generation.base_generator import BaseGenerator
-from config.base_config import GenerationConfig
+from app.core.generation.base_generator import BaseGenerator
+from app.config.base_config import GenerationConfig
+
 
 logger = logging.getLogger(__name__)
 

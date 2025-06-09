@@ -5,8 +5,8 @@
 from typing import Optional
 import logging
 
-from core.generation.base_generator import BaseGenerator
-from utils.input_processor import InputProcessor
+from app.core.generation.base_generator import BaseGenerator
+from app.utils.input_processor import InputProcessor
 
 logger = logging.getLogger(__name__)
 

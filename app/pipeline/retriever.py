@@ -5,13 +5,13 @@
 from typing import List, Dict, Any, Optional, Tuple
 import logging
 
-from core.search.base_searcher import BaseSearcher
-from core.embedding.base_embedder import BaseEmbedder
-from utils.input_processor import InputProcessor
-from utils.query_enhancer import QueryEnhancer
-from utils.filter_builder import FilterBuilder
-from config.base_config import SearchConfig
-from config.model_mappings import auto_configure_for_index
+from app.core.search.base_searcher import BaseSearcher
+from app.core.embedding.base_embedder import BaseEmbedder
+from app.utils.input_processor import InputProcessor
+from app.utils.query_enhancer import QueryEnhancer
+from app.utils.filter_builder import FilterBuilder
+from app.config.base_config import SearchConfig
+from app.config.model_mappings import auto_configure_for_index
 
 logger = logging.getLogger(__name__)
 

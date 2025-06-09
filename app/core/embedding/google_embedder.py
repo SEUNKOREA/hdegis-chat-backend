@@ -7,9 +7,9 @@ import logging
 from google import genai
 from google.genai.types import EmbedContentConfig
 
-from .base_embedder import BaseEmbedder
-from config.model_mappings import get_embedding_model_info
-from config.secrets_config import GoogleCloudSecrets
+from app.core.embedding.base_embedder import BaseEmbedder
+from app.config.model_mappings import get_embedding_model_info
+from app.config.secrets_config import GoogleCloudSecrets
 
 logger = logging.getLogger(__name__)
 

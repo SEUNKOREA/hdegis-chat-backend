@@ -6,9 +6,9 @@ from typing import List, Dict, Any, Optional, Tuple
 import logging
 from elasticsearch import Elasticsearch
 
-from .base_searcher import BaseSearcher
-from config.secrets_config import ElasticsearchSecrets
-from config.base_config import ElasticsearchConfig
+from app.core.search.base_searcher import BaseSearcher
+from app.config.secrets_config import ElasticsearchSecrets
+from app.config.base_config import ElasticsearchConfig
 
 logger = logging.getLogger(__name__)
 
