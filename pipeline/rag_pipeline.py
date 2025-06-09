@@ -2,7 +2,7 @@
 통합 RAG 파이프라인
 """
 
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List, Dict, Any, Tuple, Optional, Generator, Iterator
 import logging
 
 from pipeline.retriever import Retriever
@@ -153,16 +153,16 @@ class RAGPipeline:
         self,
         user_query: str,
         user_filter: str = ""
-    ):
+    ) -> Tuple[Iterator[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
-        스트리밍 RAG 파이프라인 실행 (동적 데이터만 받음)
+        스트리밍 RAG 파이프라인 실행 (검색 결과도 함께 반환)
         
         Args:
             user_query: 사용자 질문 (동적)
             user_filter: 사용자 필터 (동적)
             
-        Yields:
-            str: 생성된 답변 청크
+        Returns:
+            Tuple: (답변 스트림 이터레이터, 전체 컨텍스트 hits, 원본 검색 hits)
         """
         logger.info(f"스트리밍 RAG 파이프라인 시작: '{user_query[:50]}...'")
         
@@ -177,8 +177,9 @@ class RAGPipeline:
             
             if not hits:
                 logger.warning("검색 결과가 없습니다")
-                yield "검색 결과를 찾을 수 없습니다."
-                return
+                def empty_generator():
+                    yield "검색 결과를 찾을 수 없습니다."
+                return empty_generator(), [], []
             
             # 2. 결과 확장 (config의 tolerance 설정에 따라)
             total_hits = hits
@@ -198,24 +199,29 @@ class RAGPipeline:
             
             # 4. 스트리밍 답변 생성
             logger.info("스트리밍 답변 생성 시작")
-            for chunk in self.generator.generate_answer_stream(
-                user_query,
-                context_parts
-            ):
-                yield chunk
             
-            logger.info("스트리밍 RAG 파이프라인 완료")
+            def answer_generator():
+                for chunk in self.generator.generate_answer_stream(
+                    user_query,
+                    context_parts
+                ):
+                    yield chunk
+                logger.info("스트리밍 RAG 파이프라인 완료")
+            
+            return answer_generator(), total_hits, hits
             
         except Exception as e:
             logger.error(f"스트리밍 RAG 파이프라인 실행 실패: {e}")
-            yield f"처리 중 오류가 발생했습니다: {str(e)}"
+            def error_generator():
+                yield f"처리 중 오류가 발생했습니다: {str(e)}"
+            return error_generator(), [], []
     
     def generate_only_stream(
         self,
         user_query: str,
         hits: List[Dict[str, Any]],
         generation_config: Optional[Dict[str, Any]] = None
-    ):
+    ) -> Iterator[str]:
         """
         기존 검색 결과로 스트리밍 답변만 생성
         

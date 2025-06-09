@@ -25,8 +25,7 @@ def setup_logging():
     # 루트 로거 설정
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s | %(name)s | %(levelname)s | %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         force=True
     )
     
@@ -160,17 +159,8 @@ def main():
     # ========== 파이프라인 실행 (동적 데이터만) ==========
     logger.info("🔍 스트리밍 파이프라인 실행 중...")
     
-    # 기존 non-streaming 방식 (주석 처리)
-    # generated_answer, total_hits, original_hits = pipeline.run(
-    #     user_query=user_query,    # 동적 데이터
-    #     user_filter=user_filter   # 동적 데이터
-    # )
-    
-    # 검색 먼저 수행 (참조 정보용)
-    original_hits = pipeline.search_only(
-        user_query=user_query,
-        user_filter=user_filter
-    )
+    # 스트리밍 답변과 검색 결과를 함께 받기
+    answer_stream, total_hits, original_hits = pipeline.run_stream(user_query, user_filter)
     
     # ========== 결과 출력 ==========
     print("\n" + "="*50 + " USER " + "="*50)
@@ -181,13 +171,14 @@ def main():
     print("Answer:\n")
     
     # 스트리밍 답변 출력
-    for chunk in pipeline.run_stream(user_query, user_filter):
+    for chunk in answer_stream:
         print(chunk, end="", flush=True)
     
     print("\n\n")  # 답변 완료 후 줄바꿈
     
     print("\n" + "="*45 + " REFERENCE " + "="*46)
     print(f"Original hits: {len(original_hits)}")
+    print(f"Total hits (with expansion): {len(total_hits)}")
     print(format_search_results(original_hits))
     
     print("\n" + "="*100)
