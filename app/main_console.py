@@ -3,6 +3,10 @@
 """
 
 import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
+
 import warnings
 from urllib3.exceptions import InsecureRequestWarning
 from dotenv import load_dotenv
@@ -14,7 +18,7 @@ warnings.filterwarnings('ignore', category=InsecureRequestWarning)
 load_dotenv()
 
 from app.factories import RAGPipelineFactory
-from app.config.pipeline_config import BaseConfig, SearchConfig, GenerationConfig, ContextConfig, StorageConfig, ElasticsearchConfig
+from app.config.pipeline_config import PipelineConfig, SearchConfig, GenerationConfig, ContextConfig, StorageConfig, ElasticsearchConfig
 from app.utils.formatters import format_search_results
 import logging
 
@@ -131,7 +135,7 @@ def create_custom_config():
     )
     
     # ========== 전체 설정 조합 ==========
-    return BaseConfig(
+    return PipelineConfig(
         search=search_config,
         generation=generation_config,
         storage=storage_config,
