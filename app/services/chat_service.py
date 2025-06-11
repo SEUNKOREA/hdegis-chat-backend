@@ -116,27 +116,40 @@ class ChatService:
             스트리밍 이벤트
         """
         try:
-            # 1. 먼저 검색 결과 전송
-            search_results = await self.get_search_results(query, filters)
-            yield StreamEvent(
-                type="search_results",
-                data={"searchResults": [result.model_dump() for result in search_results]}
-            )
-            
-            # 2. 스트리밍 응답 생성 및 전송
             filter_str = " & ".join(filters) if filters else ""
             
             # 동기 제너레이터를 비동기로 변환
             loop = asyncio.get_event_loop()
             
-            def get_stream_generator():
+            def get_stream_data():
+                """동기 함수에서 스트림 데이터와 메타데이터를 함께 반환"""
                 return self.pipeline.run_stream(query, filter_str)
             
             # 스트림 생성기를 별도 스레드에서 실행
-            stream_gen = await loop.run_in_executor(None, get_stream_generator)
+            result = await loop.run_in_executor(None, get_stream_data)
+            answer_stream, total_hits, original_hits = result
             
-            # 청크별로 전송
-            for chunk in stream_gen:
+            # 1. 먼저 검색 결과 전송 (original_hits 사용)
+            search_results = self._format_search_results(original_hits)
+            yield StreamEvent(
+                type="search_results",
+                data={"searchResults": [result.model_dump() for result in search_results]}
+            )
+            
+            # 2. 청크별로 전송 - answer_stream을 직접 이터레이션
+            def iterate_chunks():
+                """동기 함수에서 청크를 하나씩 반환"""
+                try:
+                    for chunk in answer_stream:
+                        yield chunk
+                except Exception as e:
+                    logger.error(f"청크 이터레이션 중 오류: {e}")
+                    yield f"스트리밍 중 오류가 발생했습니다: {str(e)}"
+            
+            # 청크별로 비동기 처리
+            chunk_iterator = await loop.run_in_executor(None, lambda: list(iterate_chunks()))
+            
+            for chunk in chunk_iterator:
                 if chunk:  # 빈 청크 제외
                     yield StreamEvent(
                         type="response_chunk",

@@ -1,7 +1,7 @@
 **/.ipynb_checkpoints/
 **/__pycache__
 
-# .env
-# key/**.json
+.env
+key/**.json
 
 txt/
