@@ -8,7 +8,7 @@ from elasticsearch import Elasticsearch
 
 from app.core.search.base_searcher import BaseSearcher
 from app.config.secrets_config import ElasticsearchSecrets
-from app.config.base_config import ElasticsearchConfig
+from app.config.pipeline_config import ElasticsearchConfig
 
 logger = logging.getLogger(__name__)
 

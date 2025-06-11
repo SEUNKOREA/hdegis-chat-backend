@@ -4,14 +4,15 @@
 """
 채팅 서비스 비즈니스 로직
 """
-
+import os
 import json
 import asyncio
-from typing import List, AsyncGenerator, Optional
+from typing import List, AsyncGenerator, Optional, Tuple
 import logging
 
 from app.models.schemas import SearchResult, StreamEvent
 from app.factories import RAGPipelineFactory
+from app.config.pipeline_config import DEFAULT_CONFIG
 
 logger = logging.getLogger(__name__)
 
@@ -19,10 +20,20 @@ logger = logging.getLogger(__name__)
 class ChatService:
     """채팅 서비스 클래스"""
     
-    def __init__(self):
-        """채팅 서비스 초기화"""
+    def __init__(self, pipeline_config=None):
+        """
+        채팅 서비스 초기화
+        
+        Args:
+            pipeline_config: 파이프라인 설정 (None이면 기본 설정 사용)
+        """
         try:
-            self.pipeline = RAGPipelineFactory.create_pipeline()
+            # 설정이 제공되지 않으면 기본 설정 사용
+            if pipeline_config is None:
+                pipeline_config = DEFAULT_CONFIG
+
+            self.pipeline = RAGPipelineFactory.create_pipeline(config=pipeline_config)
+            self.current_config = pipeline_config   # 현재설정 보관
             logger.info("RAG 파이프라인 초기화 완료")
         except Exception as e:
             logger.error(f"RAG 파이프라인 초기화 실패: {e}")
@@ -59,7 +70,7 @@ class ChatService:
             logger.error(f"검색 실패: {e}")
             raise
     
-    async def generate_response(self, query: str, filters: List[str]) -> str:
+    async def generate_response(self, query: str, filters: List[str]) -> Tuple:
         """
         일반 응답 생성 (non-streaming)
         
@@ -83,7 +94,7 @@ class ChatService:
             )
             
             answer, total_hits, original_hits = result
-            return answer
+            return answer, self._format_search_results(original_hits)
             
         except Exception as e:
             logger.error(f"응답 생성 실패: {e}")
@@ -163,16 +174,11 @@ class ChatService:
                 # 파일 경로 처리 (MinIO 경로 또는 로컬 경로)
                 file_path = src.get("minio_pdf_path") or src.get("gcs_pdf_path") or "public/sample.pdf"
                 
-                # 미리보기 텍스트 생성
-                preview_text = src.get("extracted_text") or src.get("content") or ""
-                preview = (preview_text[:200] + "...") if len(preview_text) > 200 else preview_text
-                
                 result = SearchResult(
-                    fileName=src.get("pdf_name") or "Unknown",
+                    fileName=os.path.basename(file_path) or "Unknown",
                     filePath=file_path,
                     pageNumber=int(src.get("page_number") or src.get("page") or 0),
-                    score=float(hit.get("_score", 0)),
-                    preview=preview
+                    score=float(hit.get("_score", -1)),
                 )
                 
                 results.append(result)

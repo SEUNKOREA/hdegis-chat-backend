@@ -3,49 +3,62 @@
 ## Project structure
 
 ```
-hdegis-chat-backend/
-├── 📁 config/
-│   ├── base_config.py          # 기본 설정 클래스들
-│   ├── secrets_config.py       # 보안 설정 (환경변수)
-│   └── model_mappings.py       # 인덱스-임베딩 모델 매핑
-│
-├── 📁 core/
-│   ├── 📁 storage/
-│   │   ├── base_storage.py     # 스토리지 추상화
-│   │   ├── minio_storage.py    # MinIO 구현
-│   │   └── gcs_storage.py      # GCS 구현
-│   ├── 📁 search/
-│   │   ├── base_searcher.py    # 검색 추상화
-│   │   └── elastic_searcher.py # Elasticsearch 구현
-│   ├── 📁 embedding/
-│   │   ├── base_embedder.py    # 임베딩 추상화
-│   │   └── google_embedder.py  # Google 임베딩 구현
-│   └── 📁 generation/
-│       ├── base_generator.py   # 생성 추상화
-│       └── gemini_generator.py # Gemini 구현
-│
-├── 📁 pipeline/
-│   ├── retriever.py           # 검색 로직
-│   ├── context_builder.py     # 컨텍스트 구성
-│   ├── generator.py           # 답변 생성
-│   └── rag_pipeline.py        # 통합 파이프라인
-│
-├── 📁 utils/
-│   ├── input_processor.py     # 입력 처리 (번역 등)
-│   ├── query_enhancer.py      # 쿼리 향상 (키워드, HyDE)
-│   ├── filter_builder.py      # 검색 필터 구성
-│   └── formatters.py          # 결과 포맷팅
-│
-├── 📁 key/                    # GCP 인증 키 파일
-│   └── gcp-service-key.json
-│
-├── factories.py               # 팩토리 패턴 구현
-├── main.py                    # 메인 실행 파일
-│
-├── .env                       # 환경변수 설정
+hdegis-chat-backend
+├── app
+│   ├── __init__.py
+│   ├── main.py
+│   ├── api
+│   │   ├── routes
+│   │   │   ├── __init__.py
+│   │   │   └── chat.py
+│   │   ├── __init__.py
+│   │   └── dependencies.py
+│   ├── config
+│   │   ├── base_config.py
+│   │   ├── model_mappings.py
+│   │   └── secrets_config.py
+│   ├── core
+│   │   ├── embedding
+│   │   │   ├── base_embedder.py
+│   │   │   └── google_embedder.py
+│   │   ├── generation
+│   │   │   ├── base_generator.py
+│   │   │   └── gemini_generator.py
+│   │   ├── search
+│   │   │   ├── base_searcher.py
+│   │   │   └── elastic_searcher.py
+│   │   ├── storage
+│   │   │   ├── base_storage.py
+│   │   │   ├── gcs_storage.py
+│   │   │   └── minio_storage.py
+│   │   └── config.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   └── schemas.py
+│   ├── pipeline
+│   │   ├── context_builder.py
+│   │   ├── generator.py
+│   │   ├── rag_pipeline.py
+│   │   └── retriever.py
+│   ├── services
+│   │   ├── __init__.py
+│   │   └── chat_service.py
+│   ├── utils
+│   │   ├── filter_builder.py
+│   │   ├── formatters.py
+│   │   ├── input_processor.py
+│   │   └── query_enhancer.py
+│   └── factories.py
+
+├── key
+│   └── pjt-dev-hdegis-app-454401-bd4fac2d452b.json
+├── tests
+├── txt
+├── .env
 ├── .gitignore
-├── requirements.txt
-└── README.md
+├── main-old.py
+├── README.md
+└── requirements.txt
 ```
 
 <br><br>

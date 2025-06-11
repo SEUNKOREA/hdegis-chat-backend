@@ -21,7 +21,7 @@ class ChatRequest(BaseModel):
                 "query": "고압차단기의 동작 원리는 무엇인가요?",
                 "filters": [
                     "1. International Standards/IEC",
-                    "3. Customer Standard Specifications/Spain/REE"
+                    "3. Customer Standard Specifications/Spain/REE",
                 ]
             }
         }
@@ -29,20 +29,18 @@ class ChatRequest(BaseModel):
 
 class SearchResult(BaseModel):
     """검색 결과 스키마"""
-    fileName: str = Field(..., description="파일명")
-    filePath: str = Field(..., description="파일 경로 (MinIO URL)")
+    fileName: str = Field(..., description="PDF 파일명")
+    filePath: str = Field(..., description="PDF 파일 경로")
     pageNumber: int = Field(..., description="페이지 번호")
-    score: float = Field(..., description="유사도 점수", ge=0, le=1)
-    preview: str = Field(..., description="내용 미리보기")
+    score: float = Field(..., description="유사도 점수") #, ge=0, le=1)
     
     class Config:
         json_schema_extra = {
             "example": {
-                "fileName": "IEC_62271_100.pdf",
-                "filePath": "/documents/IEC_62271_100.pdf",
+                "fileName": "IEEE Std C37.122-2010.pdf",
+                "filePath": "1. International Standards/IEEE/IEEE Std C37.122-2010.pdf",
                 "pageNumber": 25,
-                "score": 0.92,
-                "preview": "고압차단기는 전력 시스템에서 회로를 개폐하는 중요한 장비입니다..."
+                "score": 92,
             }
         }
 
@@ -59,11 +57,10 @@ class ChatResponse(BaseModel):
                 "message": "고압차단기는 전력 시스템에서 중요한 역할을 합니다...",
                 "searchResults": [
                     {
-                        "fileName": "IEC_62271_100.pdf",
-                        "filePath": "/documents/IEC_62271_100.pdf",
+                        "fileName": "IEEE Std C37.122-2010.pdf",
+                        "filePath": "1. International Standards/IEEE/IEEE Std C37.122-2010.pdf",
                         "pageNumber": 25,
-                        "score": 0.92,
-                        "preview": "고압차단기는 전력 시스템에서 회로를 개폐하는..."
+                        "score": 92,
                     }
                 ],
                 "timestamp": "2024-01-01T12:00:00Z"

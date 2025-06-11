@@ -27,7 +27,7 @@ from app.utils.input_processor import InputProcessor
 from app.utils.query_enhancer import QueryEnhancer
 
 # 설정
-from app.config.base_config import BaseConfig, SearchConfig, DEFAULT_CONFIG
+from app.config.pipeline_config import PipelineConfig, SearchConfig, DEFAULT_CONFIG
 from app.config.secrets_config import SecretsConfig, load_secrets
 from app.config.model_mappings import get_embedding_model_for_index
 
@@ -69,7 +69,7 @@ class SearcherFactory:
     def create_searcher(
         searcher_type: str,
         secrets: SecretsConfig,
-        config: BaseConfig
+        config: PipelineConfig
     ) -> BaseSearcher:
         """
         검색기 타입에 따른 검색기 인스턴스 생성
@@ -146,7 +146,7 @@ class RAGPipelineFactory:
     
     @staticmethod
     def create_pipeline(
-        config: Optional[BaseConfig] = None,
+        config: Optional[PipelineConfig] = None,
         secrets: Optional[SecretsConfig] = None
     ) -> RAGPipeline:
         """
@@ -245,8 +245,8 @@ class RAGPipelineFactory:
         Returns:
             RAGPipeline: RAG 파이프라인
         """
-        # 간단한 설정으로 BaseConfig 생성
-        config = BaseConfig(
+        # 간단한 설정으로 PipelinConfig 생성
+        config = PipelineConfig(
             search=SearchConfig(
                 index_name=index_name,
                 search_method=search_method,

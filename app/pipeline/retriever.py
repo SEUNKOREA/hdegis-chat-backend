@@ -10,7 +10,7 @@ from app.core.embedding.base_embedder import BaseEmbedder
 from app.utils.input_processor import InputProcessor
 from app.utils.query_enhancer import QueryEnhancer
 from app.utils.filter_builder import FilterBuilder
-from app.config.base_config import SearchConfig
+from app.config.pipeline_config import SearchConfig
 from app.config.model_mappings import auto_configure_for_index
 
 logger = logging.getLogger(__name__)

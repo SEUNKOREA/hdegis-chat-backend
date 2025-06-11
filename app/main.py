@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 from app.api.routes import chat
-from app.core.config import get_settings
+from app.config.app_config import get_app_config, get_cors_config
 
 # 로깅 설정
 logging.basicConfig(
@@ -20,24 +20,22 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # 설정 로드
-settings = get_settings()
+config = get_app_config()
 
 # FastAPI 앱 생성
 app = FastAPI(
-    title=settings.api_title,
-    version=settings.api_version,
-    description="hdegis-chat-backend 파이프라인 백엔드 API",
-    docs_url="/docs",
-    redoc_url="/redoc"
+    title=config.api_title,
+    version=config.api_version,
+    description=config.api_description,
+    docs_url=config.docs_url,
+    redoc_url=config.redoc_url,
+    openapi_url=config.openapi_url
 )
 
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    **get_cors_config(config)
 )
 
 # 라우터 등록
@@ -54,7 +52,7 @@ async def root():
     """루트 엔드포인트"""
     return {
         "message": "hdegis-chat-backend API",
-        "version": settings.api_version,
+        "version": config.api_version,
         "status": "running"
     }
 

@@ -14,7 +14,7 @@ warnings.filterwarnings('ignore', category=InsecureRequestWarning)
 load_dotenv()
 
 from app.factories import RAGPipelineFactory
-from app.config.base_config import BaseConfig, SearchConfig, GenerationConfig, ContextConfig, StorageConfig, ElasticsearchConfig
+from app.config.pipeline_config import BaseConfig, SearchConfig, GenerationConfig, ContextConfig, StorageConfig, ElasticsearchConfig
 from app.utils.formatters import format_search_results
 import logging
 

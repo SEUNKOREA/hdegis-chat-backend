@@ -31,7 +31,7 @@ router = APIRouter(prefix="/api/v1", tags=["chat"])
     "/chat",
     response_model=ChatResponse,
     summary="일반 채팅",
-    description="사용자 질문에 대한 일반 응답을 반환합니다.",
+    description="사용자 질문에 대한 일반 응답(non-streaming)을 반환합니다.",
     responses={
         200: {"description": "성공적인 응답"},
         400: {"description": "잘못된 요청"},
@@ -55,13 +55,8 @@ async def chat_endpoint(
     try:
         logger.info(f"채팅 요청: {request.query[:50]}...")
         
-        # 검색 결과 및 응답 생성
-        search_results = await chat_service.get_search_results(
-            request.query, 
-            request.filters
-        )
-        
-        response_message = await chat_service.generate_response(
+        # 검색 결과 및 응답 생성        
+        response_message, search_results = await chat_service.generate_response(
             request.query,
             request.filters
         )
@@ -149,15 +144,14 @@ async def chat_stream_endpoint(
         )
 
 
-@router.get(
+@router.post(
     "/search",
     response_model=List[SearchResult],
-    summary="검색만 수행",
+    summary="검색만 수행 (실제 서비스에서는 미사용, 테스트용)",
     description="사용자 질문에 대한 검색 결과만 반환합니다."
 )
 async def search_endpoint(
-    query: str,
-    filters: List[str] = [],
+    request: ChatRequest,
     chat_service: ChatService = ChatServiceDep
 ) -> List[SearchResult]:
     """
@@ -172,9 +166,9 @@ async def search_endpoint(
         검색 결과 목록
     """
     try:
-        logger.info(f"검색 요청: {query[:50]}...")
+        logger.info(f"검색 요청: {request.query[:50]}...")
         
-        search_results = await chat_service.get_search_results(query, filters)
+        search_results = await chat_service.get_search_results(request.query, request.filters)
         
         logger.info(f"검색 완료: {len(search_results)}개 결과")
         return search_results

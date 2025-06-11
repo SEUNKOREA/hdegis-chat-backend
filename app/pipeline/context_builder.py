@@ -8,7 +8,7 @@ import os
 from google.genai import types
 
 from app.core.storage.base_storage import BaseStorage
-from app.config.base_config import ContextConfig
+from app.config.pipeline_config import ContextConfig
 
 logger = logging.getLogger(__name__)
 
