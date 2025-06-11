@@ -4,7 +4,10 @@
 """
 FastAPI 애플리케이션 메인 파일
 """
+import os
+import sys
 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
@@ -66,7 +69,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
-        port=8000,
+        port=5003,
         reload=True,
         log_level="info"
     )
