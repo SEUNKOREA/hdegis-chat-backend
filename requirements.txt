@@ -1,7 +1,7 @@
 backports.tarfile==1.2.0
 elasticsearch==8.17.2
 fastapi==0.115.12
-google-cloud-aiplatform==1.95.0
+google-cloud-aiplatform
 google-cloud-translate==2.0.1
 grpcio-status==1.49.0rc1
 importlib-metadata==8.0.0

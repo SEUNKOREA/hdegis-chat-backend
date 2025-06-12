@@ -1,8 +1,8 @@
 # ========================================
-# 4. app/services/chat_service.py (새로 생성)
+# 4. app/services/chat_service.py (개선된 버전)
 # ========================================
 """
-채팅 서비스 비즈니스 로직
+채팅 서비스 비즈니스 로직 - 스트리밍 개선 버전
 """
 import os
 import json
@@ -106,7 +106,7 @@ class ChatService:
         filters: List[str]
     ) -> AsyncGenerator[StreamEvent, None]:
         """
-        스트리밍 응답 생성
+        스트리밍 응답 생성 (개선된 버전)
         
         Args:
             query: 사용자 질문
@@ -118,48 +118,73 @@ class ChatService:
         try:
             filter_str = " & ".join(filters) if filters else ""
             
-            # 동기 제너레이터를 비동기로 변환
+            # 1단계: 스트리밍 파이프라인 실행 (검색 + 답변 생성)
+            logger.info("스트리밍 파이프라인 시작")
+            
+            # 검색과 답변 생성을 별도 스레드에서 실행
             loop = asyncio.get_event_loop()
             
-            def get_stream_data():
-                """동기 함수에서 스트림 데이터와 메타데이터를 함께 반환"""
-                return self.pipeline.run_stream(query, filter_str)
+            # 검색 결과를 미리 가져오기 (답변 완료 후 전송용)
+            search_results_task = loop.run_in_executor(
+                None,
+                self.get_search_results_sync,
+                query,
+                filters
+            )
             
-            # 스트림 생성기를 별도 스레드에서 실행
-            result = await loop.run_in_executor(None, get_stream_data)
-            answer_stream, total_hits, original_hits = result
+            # 스트리밍 답변 생성
+            stream_task = loop.run_in_executor(
+                None,
+                self.get_streaming_generator,
+                query,
+                filter_str
+            )
             
-            # 1. 먼저 검색 결과 전송 (original_hits 사용)
-            search_results = self._format_search_results(original_hits)
+            # 스트리밍 답변을 실시간으로 전송
+            stream_generator = await stream_task
+            
+            # 2단계: 답변 스트리밍 (실제 타이핑 효과)
+            full_answer = ""
+            chunk_buffer = ""
+            
+            for chunk in stream_generator:
+                if chunk:
+                    full_answer += chunk
+                    chunk_buffer += chunk
+                    
+                    # 청크를 더 작은 단위로 분할하여 타이핑 효과 구현
+                    while len(chunk_buffer) > 0:
+                        # 한 번에 1-3글자씩 전송 (자연스러운 타이핑 효과)
+                        send_length = min(len(chunk_buffer), 3)
+                        send_chunk = chunk_buffer[:send_length]
+                        chunk_buffer = chunk_buffer[send_length:]
+                        
+                        yield StreamEvent(
+                            type="response_chunk",
+                            data={"chunk": send_chunk}
+                        )
+                        
+                        # 타이핑 속도 조절 (20-50ms 간격)
+                        await asyncio.sleep(0.02 + len(send_chunk) * 0.01)
+            
+            # 3단계: 답변 완료 신호
+            yield StreamEvent(type="response_completed", data={})
+            logger.info("답변 스트리밍 완료")
+            
+            # 4단계: 잠시 대기 후 검색 결과 전송 (자연스러운 UX)
+            await asyncio.sleep(1.0)  # 1초 대기
+            
+            # 검색 결과 가져오기
+            search_results = await search_results_task
+            
             yield StreamEvent(
                 type="search_results",
                 data={"searchResults": [result.model_dump() for result in search_results]}
             )
             
-            # 2. 청크별로 전송 - answer_stream을 직접 이터레이션
-            def iterate_chunks():
-                """동기 함수에서 청크를 하나씩 반환"""
-                try:
-                    for chunk in answer_stream:
-                        yield chunk
-                except Exception as e:
-                    logger.error(f"청크 이터레이션 중 오류: {e}")
-                    yield f"스트리밍 중 오류가 발생했습니다: {str(e)}"
-            
-            # 청크별로 비동기 처리
-            chunk_iterator = await loop.run_in_executor(None, lambda: list(iterate_chunks()))
-            
-            for chunk in chunk_iterator:
-                if chunk:  # 빈 청크 제외
-                    yield StreamEvent(
-                        type="response_chunk",
-                        data={"chunk": chunk}
-                    )
-                    # 비동기 컨텍스트에서 다른 작업이 실행될 수 있도록 양보
-                    await asyncio.sleep(0)
-            
-            # 3. 완료 신호
+            # 5단계: 전체 완료 신호
             yield StreamEvent(type="completed", data={})
+            logger.info("스트리밍 프로세스 완전 완료")
             
         except Exception as e:
             logger.error(f"스트리밍 응답 생성 실패: {e}")
@@ -167,6 +192,69 @@ class ChatService:
                 type="error",
                 data={"error": str(e)}
             )
+    
+    def get_search_results_sync(self, query: str, filters: List[str]) -> List[SearchResult]:
+        """
+        동기 버전 검색 결과 반환 (스레드 실행용)
+        
+        Args:
+            query: 사용자 질문
+            filters: 문서 필터 목록
+            
+        Returns:
+            검색 결과 목록
+        """
+        try:
+            filter_str = " & ".join(filters) if filters else ""
+            hits = self.pipeline.search_only(query, filter_str)
+            return self._format_search_results(hits)
+        except Exception as e:
+            logger.error(f"동기 검색 실패: {e}")
+            return []
+    
+    def get_streaming_generator(self, query: str, filter_str: str):
+        """
+        동기 스트리밍 제너레이터 반환 (스레드 실행용)
+        
+        Args:
+            query: 사용자 질문
+            filter_str: 필터 문자열
+            
+        Returns:
+            스트리밍 제너레이터
+        """
+        try:
+            # RAG 파이프라인에서 스트리밍 제너레이터 가져오기
+            answer_stream, total_hits, original_hits = self.pipeline.run_stream(query, filter_str)
+            return answer_stream
+        except Exception as e:
+            logger.error(f"스트리밍 제너레이터 생성 실패: {e}")
+            # 에러 시 빈 제너레이터 반환
+            def empty_generator():
+                yield f"답변 생성 중 오류가 발생했습니다: {str(e)}"
+            return empty_generator()
+    
+    async def generate_chunked_response(
+        self,
+        text: str,
+        chunk_size: int = 3,
+        delay_ms: int = 0
+    ) -> AsyncGenerator[str, None]:
+        """
+        텍스트를 청크 단위로 분할하여 스트리밍 (타이핑 효과용)
+        
+        Args:
+            text: 전체 텍스트
+            chunk_size: 청크 크기 (글자 수)
+            delay_ms: 청크 간 지연 시간 (밀리초)
+            
+        Yields:
+            텍스트 청크
+        """
+        for i in range(0, len(text), chunk_size):
+            chunk = text[i:i + chunk_size]
+            yield chunk
+            await asyncio.sleep(delay_ms / 1000.0)
     
     def _format_search_results(self, hits: List) -> List[SearchResult]:
         """

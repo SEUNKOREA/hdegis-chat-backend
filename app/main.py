@@ -8,6 +8,8 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
+from dotenv import load_dotenv
+load_dotenv()
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
@@ -24,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 # 설정 로드
 config = get_app_config()
+cors_config = get_cors_config(config)
 
 # FastAPI 앱 생성
 app = FastAPI(
@@ -38,11 +41,26 @@ app = FastAPI(
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    **get_cors_config(config)
+    allow_origins=cors_config["allow_origins"],
+    allow_credentials=cors_config["allow_credentials"],
+    allow_methods=cors_config["allow_methods"],
+    allow_headers=cors_config["allow_headers"],
 )
 
 # 라우터 등록
 app.include_router(chat.router)
+
+# OPTIONS 요청 처리를 위한 미들웨어 (필요시)
+@app.middleware("http")
+async def cors_handler(request, call_next):
+    response = await call_next(request)
+    
+    # 추가 헤더 설정 (스트리밍용)
+    response.headers["Access-Control-Allow-Origin"] = "*"  # 또는 특정 도메인
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    
+    return response
 
 # 글로벌 예외 핸들러
 @app.exception_handler(Exception)
@@ -69,7 +87,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
-        port=5003,
+        port=5002,
         reload=True,
         log_level="info"
     )

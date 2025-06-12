@@ -18,9 +18,14 @@ class AppConfig(BaseSettings):
 
     # CORS 설정
     allowed_origins: List[str] = [
-        "http://node.hd-aic.com:32689",  # 프론트엔드 외부 접속 주소
+        "http://node.hd-aic.com:32720",  # h100 프론트엔드 외부 접속 주소
+        "http://node.hd-aic.com:32689",  # 일렉 프론트엔드 외부 접속 주소
         "http://localhost:5000",         # 프론트엔드 내부 개발용
     ]
+    # 추가 CORS 설정
+    allow_credentials: bool = True
+    allow_methods: List[str] = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allow_headers: List[str] = ["*"]
 
     # 요청 제한 설정
     max_request_size: int = 10 * 1024 * 1024  # 10MB
@@ -59,4 +64,7 @@ def get_cors_config(config: AppConfig) -> dict:
     """
     return {
         "allow_origins": config.allowed_origins,
+        "allow_credentials": config.allow_credentials,
+        "allow_methods": config.allow_methods,
+        "allow_headers": config.allow_headers,
     }
