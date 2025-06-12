@@ -18,10 +18,8 @@ class AppConfig(BaseSettings):
 
     # CORS 설정
     allowed_origins: List[str] = [
-        "http://localhost:5173",  # Vue.js dev server
-        "http://localhost:3000",  # 추가 프론트엔드 포트
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000",
+        "http://node.hd-aic.com:32689",  # 프론트엔드 외부 접속 주소
+        "http://localhost:5000",         # 프론트엔드 내부 개발용
     ]
 
     # 요청 제한 설정
