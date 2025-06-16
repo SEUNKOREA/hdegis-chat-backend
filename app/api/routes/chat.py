@@ -31,7 +31,7 @@ router = APIRouter(prefix="/api/v1", tags=["chat"])
     "/chat",
     response_model=ChatResponse,
     summary="일반 채팅",
-    description="사용자 질문에 대한 일반 응답(non-streaming)을 반환합니다.",
+    description="사용자 질문에 대한 일반 응답(non-streaming)을 반환 (실제 서비스에서는 미사용, 테스트용)",
     responses={
         200: {"description": "성공적인 응답"},
         400: {"description": "잘못된 요청"},
