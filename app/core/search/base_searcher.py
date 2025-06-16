@@ -76,8 +76,8 @@ class BaseSearcher(ABC):
         text_fields: List[str],
         vector_field: str,
         top_k: int,
-        vector_weight: float = 0.3,
-        text_weight: float = 0.7,
+        fusion_method: str = "convex",
+        fusion_params: Optional[Dict[str, Any]] = None,
         filters: Optional[List[Dict[str, Any]]] = None
     ) -> List[Dict[str, Any]]:
         """
@@ -90,8 +90,8 @@ class BaseSearcher(ABC):
             text_fields: 텍스트 검색 대상 필드들
             vector_field: 벡터 필드명
             top_k: 반환할 결과 개수
-            vector_weight: 벡터 검색 가중치
-            text_weight: 텍스트 검색 가중치
+            fusion_method: score 정규화 방식 (convex 또는 rrf)
+            fusion_params: fusion method 관련 파라미터
             filters: 적용할 필터들
             
         Returns:

@@ -26,57 +26,6 @@ logger = logging.getLogger(__name__)
 # 라우터 생성
 router = APIRouter(prefix="/api/v1", tags=["chat"])
 
-
-@router.post(
-    "/chat",
-    response_model=ChatResponse,
-    summary="일반 채팅",
-    description="사용자 질문에 대한 일반 응답(non-streaming)을 반환 (실제 서비스에서는 미사용, 테스트용)",
-    responses={
-        200: {"description": "성공적인 응답"},
-        400: {"description": "잘못된 요청"},
-        500: {"description": "서버 오류", "model": ErrorResponse}
-    }
-)
-async def chat_endpoint(
-    request: ChatRequest,
-    chat_service: ChatService = ChatServiceDep
-) -> ChatResponse:
-    """
-    일반 채팅 응답 (non-streaming)
-    
-    Args:
-        request: 채팅 요청 데이터
-        chat_service: 채팅 서비스 의존성
-        
-    Returns:
-        채팅 응답
-    """
-    try:
-        logger.info(f"채팅 요청: {request.query[:50]}...")
-        
-        # 검색 결과 및 응답 생성        
-        response_message, search_results = await chat_service.generate_response(
-            request.query,
-            request.filters
-        )
-        
-        response = ChatResponse(
-            message=response_message,
-            searchResults=search_results
-        )
-        
-        logger.info("채팅 응답 완료")
-        return response
-        
-    except Exception as e:
-        logger.error(f"채팅 처리 오류: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"채팅 처리 중 오류가 발생했습니다: {str(e)}"
-        )
-
-
 @router.post(
     "/chat/stream",
     summary="스트리밍 채팅",
@@ -141,6 +90,56 @@ async def chat_stream_endpoint(
         raise HTTPException(
             status_code=500,
             detail=f"스트리밍 설정 중 오류가 발생했습니다: {str(e)}"
+        )
+
+
+@router.post(
+    "/chat",
+    response_model=ChatResponse,
+    summary="일반 채팅 (실제 서비스에서는 미사용, 테스트용)",
+    description="사용자 질문에 대한 일반 응답(non-streaming)을 반환합니다.",
+    responses={
+        200: {"description": "성공적인 응답"},
+        400: {"description": "잘못된 요청"},
+        500: {"description": "서버 오류", "model": ErrorResponse}
+    }
+)
+async def chat_endpoint(
+    request: ChatRequest,
+    chat_service: ChatService = ChatServiceDep
+) -> ChatResponse:
+    """
+    일반 채팅 응답 (non-streaming)
+    
+    Args:
+        request: 채팅 요청 데이터
+        chat_service: 채팅 서비스 의존성
+        
+    Returns:
+        채팅 응답
+    """
+    try:
+        logger.info(f"채팅 요청: {request.query[:50]}...")
+        
+        # 검색 결과 및 응답 생성        
+        response_message, search_results = await chat_service.generate_response(
+            request.query,
+            request.filters
+        )
+        
+        response = ChatResponse(
+            message=response_message,
+            searchResults=search_results
+        )
+        
+        logger.info("채팅 응답 완료")
+        return response
+        
+    except Exception as e:
+        logger.error(f"채팅 처리 오류: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"채팅 처리 중 오류가 발생했습니다: {str(e)}"
         )
 
 

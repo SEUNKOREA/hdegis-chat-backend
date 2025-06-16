@@ -21,8 +21,10 @@ class SearchConfig:
     text_search_type: str = "best_fields"
     
     # 하이브리드 검색 가중치
-    vector_weight: float = 0.3
-    text_weight: float = 0.7
+    fusion_method: str = "convex"   # convex | rrf
+    rrf_k: int = 60                 # rrf 파라미터
+    vector_weight: float = 0.3      # convex 파라미터
+    text_weight: float = 0.7        # convex 파라미터
 
 
 @dataclass
@@ -127,8 +129,12 @@ def get_custom_pipeline_config() -> PipelineConfig:
         vector_search_candidates=100,                        # 벡터 검색 후보 수
         text_search_operator="or",                           # 텍스트 검색 연산자 [or|and]
         text_search_type="best_fields",                      # 텍스트 검색 타입
-        vector_weight=0.4,                                   # 하이브리드 검색의 벡터 가중치
-        text_weight=0.6,                                     # 하이브리드 검색의 텍스트 가중치
+
+        # 하이브리드 검색 설정
+        fusion_method="rrf",     # convex | rrf
+        rrf_k=60,                 # rrf 파라미터
+        vector_weight=0.3,        # convex 파라미터
+        text_weight=0.7,          # convex 파라미터
     )
     
     # ========== 생성 설정 ==========

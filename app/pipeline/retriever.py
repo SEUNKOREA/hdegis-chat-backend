@@ -227,6 +227,13 @@ class Retriever:
         
         logger.debug("하이브리드 검색 준비 완료")
         
+        # fusion_params 구성
+        fusion_params = {
+            "vector_weight": self.config.vector_weight,
+            "text_weight": self.config.text_weight,
+            "rrf_k": self.config.rrf_k
+        }
+
         return self.searcher.hybrid_search(
             index_name=index_name,
             query=text_query,
@@ -234,8 +241,8 @@ class Retriever:
             text_fields=config["text_fields"],
             vector_field=config["vector_field"],
             top_k=top_k,
-            vector_weight=self.config.vector_weight,
-            text_weight=self.config.text_weight,
+            fusion_method=self.config.fusion_method, 
+            fusion_params=fusion_params, 
             filters=filters
         )
     
