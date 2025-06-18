@@ -174,7 +174,8 @@ class RAGPipelineFactory:
         
         # 2. 유틸리티 컴포넌트들 생성
         input_processor = InputProcessor()
-        query_enhancer = QueryEnhancer(generator_base, input_processor)
+        # QueryEnhancer에 GenerationConfig 전달
+        query_enhancer = QueryEnhancer(generator_base, input_processor, config.generation)
         
         # 3. 임베딩 모델 생성 (벡터 검색 필요시)
         embedder = None
@@ -201,7 +202,7 @@ class RAGPipelineFactory:
         retriever = Retriever(
             searcher=searcher,
             embedder=embedder,
-            query_enhancer=query_enhancer,
+            query_enhancer=query_enhancer,  # 이제 GenerationConfig가 포함됨
             input_processor=input_processor,
             config=search_config  # SearchConfig 전달
         )

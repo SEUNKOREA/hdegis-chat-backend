@@ -148,7 +148,7 @@ class Retriever:
         config: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
         """키워드 검색 구현"""
-        # 쿼리 향상 (키워드 생성)
+        # 쿼리 향상 (키워드 생성) - keyword_generation 설정 사용
         if self.query_enhancer:
             keywords = self.query_enhancer.generate_keywords(user_query)
             # OR로 분리된 키워드들을 공백으로 연결
@@ -211,7 +211,7 @@ class Retriever:
         # 쿼리 준비
         translated_query = self.input_processor.translate_text(user_query, 'en')
         
-        # 키워드 생성
+        # 키워드 생성 - keyword_generation 설정 사용
         if self.query_enhancer:
             keywords = self.query_enhancer.generate_keywords(translated_query, False)
             keyword_list = [kw.strip() for kw in keywords.split(" OR ")]
@@ -227,13 +227,6 @@ class Retriever:
         
         logger.debug("하이브리드 검색 준비 완료")
         
-        # fusion_params 구성
-        fusion_params = {
-            "vector_weight": self.config.vector_weight,
-            "text_weight": self.config.text_weight,
-            "rrf_k": self.config.rrf_k
-        }
-
         return self.searcher.hybrid_search(
             index_name=index_name,
             query=text_query,
@@ -241,8 +234,8 @@ class Retriever:
             text_fields=config["text_fields"],
             vector_field=config["vector_field"],
             top_k=top_k,
-            fusion_method=self.config.fusion_method, 
-            fusion_params=fusion_params, 
+            vector_weight=self.config.vector_weight,
+            text_weight=self.config.text_weight,
             filters=filters
         )
     
@@ -258,7 +251,7 @@ class Retriever:
         if not self.embedder or not self.query_enhancer:
             raise ValueError("HyDE 검색을 위해서는 embedder와 query_enhancer가 필요합니다")
         
-        # HyDE 문서 생성
+        # HyDE 문서 생성 - hyde_generation 설정 사용
         hyde_doc = self.query_enhancer.generate_hyde_document(user_query)
         logger.debug("HyDE 문서 생성 완료")
         
@@ -288,11 +281,11 @@ class Retriever:
         # 쿼리 준비
         translated_query = self.input_processor.translate_text(user_query, 'en')
         
-        # HyDE 문서 생성 및 임베딩
+        # HyDE 문서 생성 및 임베딩 - hyde_generation 설정 사용
         hyde_doc = self.query_enhancer.generate_hyde_document(translated_query, False)
         query_vector = self.embedder.embed_text(hyde_doc, task="RETRIEVAL_QUERY")
         
-        # 키워드 생성
+        # 키워드 생성 - keyword_generation 설정 사용
         keywords = self.query_enhancer.generate_keywords(translated_query, False)
         keyword_list = [kw.strip() for kw in keywords.split(" OR ")]
         text_query = " ".join(keyword_list)

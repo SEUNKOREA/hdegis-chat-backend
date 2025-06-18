@@ -2,11 +2,12 @@
 쿼리 향상 유틸리티 (키워드 생성, HyDE 등)
 """
 
-from typing import Optional
+from typing import Optional, Dict, Any
 import logging
 
 from app.core.generation.base_generator import BaseGenerator
 from app.utils.input_processor import InputProcessor
+from app.config.pipeline_config import GenerationConfig
 
 logger = logging.getLogger(__name__)
 
@@ -14,22 +15,29 @@ logger = logging.getLogger(__name__)
 class QueryEnhancer:
     """쿼리 향상 처리 클래스"""
     
-    def __init__(self, generator: BaseGenerator, input_processor: InputProcessor):
+    def __init__(
+        self, 
+        generator: BaseGenerator, 
+        input_processor: InputProcessor,
+        generation_config: Optional[GenerationConfig] = None
+    ):
         """
         쿼리 향상기 초기화
         
         Args:
             generator: 텍스트 생성기
             input_processor: 입력 처리기
+            generation_config: 생성 설정 (각 단계별 설정 포함)
         """
         self.generator = generator
         self.input_processor = input_processor
+        self.generation_config = generation_config or GenerationConfig()
     
     def generate_keywords(
         self,
         query: str,
         translate_to_english: bool = True,
-        generation_config: Optional[dict] = None
+        generation_config: Optional[Dict[str, Any]] = None
     ) -> str:
         """
         쿼리에서 키워드 생성
@@ -37,7 +45,7 @@ class QueryEnhancer:
         Args:
             query: 원본 쿼리
             translate_to_english: 영어로 번역 여부
-            generation_config: 생성 설정
+            generation_config: 생성 설정 (None이면 기본 keyword_generation 설정 사용)
             
         Returns:
             str: 생성된 키워드 (OR로 연결)
@@ -52,8 +60,8 @@ class QueryEnhancer:
             # 키워드 생성 프롬프트
             prompt = self._get_keyword_generation_prompt(query_en)
             
-            # 키워드 생성
-            config = generation_config or {"temperature": 0.1, "max_output_tokens": 256}
+            # 생성 설정: 파라미터 우선 → config의 keyword_generation → 기본값
+            config = generation_config or self.generation_config.keyword_generation
             keywords = self.generator.generate_text(prompt, generation_config=config)
             
             logger.debug(f"생성된 키워드: {keywords}")
@@ -68,7 +76,7 @@ class QueryEnhancer:
         self,
         query: str,
         translate_to_english: bool = True,
-        generation_config: Optional[dict] = None
+        generation_config: Optional[Dict[str, Any]] = None
     ) -> str:
         """
         HyDE 가상문서 생성
@@ -76,7 +84,7 @@ class QueryEnhancer:
         Args:
             query: 원본 쿼리
             translate_to_english: 영어로 번역 여부
-            generation_config: 생성 설정
+            generation_config: 생성 설정 (None이면 기본 hyde_generation 설정 사용)
             
         Returns:
             str: 생성된 가상문서
@@ -91,8 +99,8 @@ class QueryEnhancer:
             # HyDE 생성 프롬프트
             prompt = self._get_hyde_generation_prompt(query_en)
             
-            # 가상문서 생성
-            config = generation_config or {"temperature": 0.3, "max_output_tokens": 512}
+            # 생성 설정: 파라미터 우선 → config의 hyde_generation → 기본값
+            config = generation_config or self.generation_config.hyde_generation
             hyde_doc = self.generator.generate_text(prompt, generation_config=config)
             
             logger.debug(f"생성된 HyDE 문서 길이: {len(hyde_doc)}")

@@ -158,8 +158,8 @@ def get_custom_pipeline_config() -> PipelineConfig:
         # 최종 답변 생성 설정
         answer_generation={
             "model": "gemini-2.0-flash-001",
-            "temperature": 0.7,
-            "max_output_tokens": 2048
+            "temperature": 0.5,
+            "max_output_tokens": 2048,
         }
     )
     
