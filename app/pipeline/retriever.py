@@ -227,6 +227,24 @@ class Retriever:
         
         logger.debug("하이브리드 검색 준비 완료")
         
+        # return self.searcher.hybrid_search(
+        #     index_name=index_name,
+        #     query=text_query,
+        #     query_vector=query_vector,
+        #     text_fields=config["text_fields"],
+        #     vector_field=config["vector_field"],
+        #     top_k=top_k,
+        #     vector_weight=self.config.vector_weight,
+        #     text_weight=self.config.text_weight,
+        #     filters=filters
+        # )
+        # fusion_params 딕셔너리로 파라미터 전달
+        fusion_params = {
+            "vector_weight": self.config.vector_weight,
+            "text_weight": self.config.text_weight,
+            "rrf_k": self.config.rrf_k  # RRF 파라미터도 추가
+        }
+        
         return self.searcher.hybrid_search(
             index_name=index_name,
             query=text_query,
@@ -234,10 +252,11 @@ class Retriever:
             text_fields=config["text_fields"],
             vector_field=config["vector_field"],
             top_k=top_k,
-            vector_weight=self.config.vector_weight,
-            text_weight=self.config.text_weight,
+            fusion_method=self.config.fusion_method,  # convex 또는 rrf
+            fusion_params=fusion_params,  # 파라미터들을 딕셔너리로 전달
             filters=filters
         )
+
     
     def _hyde_vector_search(
         self,
@@ -292,6 +311,24 @@ class Retriever:
         
         logger.debug("HyDE 하이브리드 검색 준비 완료")
         
+        # return self.searcher.hybrid_search(
+        #     index_name=index_name,
+        #     query=text_query,
+        #     query_vector=query_vector,
+        #     text_fields=config["text_fields"],
+        #     vector_field=config["vector_field"],
+        #     top_k=top_k,
+        #     vector_weight=self.config.vector_weight,
+        #     text_weight=self.config.text_weight,
+        #     filters=filters
+        # )
+        # fusion_params 딕셔너리로 파라미터 전달
+        fusion_params = {
+            "vector_weight": self.config.vector_weight,
+            "text_weight": self.config.text_weight,
+            "rrf_k": self.config.rrf_k  # RRF 파라미터도 추가
+        }
+        
         return self.searcher.hybrid_search(
             index_name=index_name,
             query=text_query,
@@ -299,8 +336,8 @@ class Retriever:
             text_fields=config["text_fields"],
             vector_field=config["vector_field"],
             top_k=top_k,
-            vector_weight=self.config.vector_weight,
-            text_weight=self.config.text_weight,
+            fusion_method=self.config.fusion_method,  # convex 또는 rrf
+            fusion_params=fusion_params,  # 파라미터들을 딕셔너리로 전달
             filters=filters
         )
     

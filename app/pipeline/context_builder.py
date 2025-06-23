@@ -97,9 +97,11 @@ class ContextBuilder:
             # 메타데이터 포함한 텍스트 구성
             metadata = self._extract_metadata(source)
             if metadata:
-                formatted_text = f"[Document {index + 1}]\n{metadata}\n\n{text_content}"
+                # formatted_text = f"[Document {index + 1}]\n{metadata}\n\n{text_content}"
+                formatted_text = f"{metadata}\n\n{text_content}"
             else:
-                formatted_text = f"[Document {index + 1}]\n{text_content}"
+                # formatted_text = f"[Document {index + 1}]\n{text_content}"
+                formatted_text = f"{text_content}"
             
             return types.Part.from_text(text=formatted_text)
             
